@@ -1,0 +1,28 @@
+* make qemu vm
+  * time sudo guix system vm /etc/config.scm --share=/tmp
+    \ this installs qemu
+    \ took: 123min (inside virtualbox guest guix)
+    \ you get a script like /gnu/store/hash-run-vm.sh
+* make qemu disk image? (after made the vm above)
+  * time sudo guix system disk-image /etc/config.scm
+    \ 116min until kernel panic due to out of space(inside the qemu-made vm!)
+* make qemu image via qemu on host (not guix on guest)
+  \ src: https://gitlab.com/rain1/guix-wiki/wikis/qemu
+  \ (as non-root user, ofc)
+  * qemu-img create -f qcow2 my_guix.cow 8G
+    \ 0 seconds, 197,120 bytes
+  - time qemu-system-x86_64 -enable-kvm -cpu host -net user -net nic,model=virtio -m 4G -hda my_guix.cow -hdb /home/zazdxscf/Downloads/guixsd-usb-install-0.10.0.x86_64-linux -boot menu=on
+  * time qemu-system-x86_64 -enable-kvm -cpu host -net user -net nic,model=virtio -m 4G -drive file=my_guix.cow,discard=on -drive file="/home/zazdxscf/Downloads/guixsd-usb-install-0.10.0.x86_64-linux",media=disk,format=raw,discard=on -boot menu=on
+* always build from source: add flag: --no-substitutes
+  \ eg. guix package -i recutils --no-substitutes --dry-run
+* search for package
+  \ guix package --search=vim
+* list package dependencies(?) for a command
+  \ guix gc --refrences $(which ls)
+  \ shows packages that the 'ls' command depends upon
+
+* fix the monospace font in xfce4-terminal
+  \ anything other than monospace looks like it was weird spaces and the chars are near each other!
+  * done: install 'font_dejavu' package, thanks to mark_weaver on irc freenode #guix
+
+

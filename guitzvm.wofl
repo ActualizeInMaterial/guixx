@@ -1,0 +1,114 @@
+* install GuixSD on Virtualbox
+  * FIRST: in Virtualbox for this vm, ensure CPU cores is set to 1 not more!(else it's slower and guest kernel(gnu 4.5.0) hangs during 'guix system init ...'
+* boot from that disk, F12, 2 (if it was Primary Slave) - should boot in under 25 sec
+* setup networking
+  * ifconfig -a
+    \ see name of interface: enp0s3
+  * ifconfig enp0s3 up
+  * dhclient -v enp0s3
+    \ gets IP
+  * ping -c 1 gnu.org
+    \ works!
+- time guix pull (don't do this here! it needs cow-store started see below!)
+  \ to update package definitions to latest git master
+  \ 8m39s
+  \ XXX: do I have to do a 'guix system reconfigure' with the .scm of the boot disk ??! else I am using like the old software, right? (except guix)
+* partition disk
+  * cfdisk
+    * gpt
+    * 1M Bios boot
+    * 1G Linux swap
+    * 7G Linux filesystem
+* format filesystems
+  * mkfs.ext4 -L myroot /dev/sda3
+    \ btrfs won't work - on boot it won't find your myroot labelled partition(also the manual says ext4 only!)
+* mount
+  * mount -o discard /dev/sda3 /mnt
+* init
+  * herd start cow-store /mnt
+    \ https://www.gnu.org/software/guix/manual/guix.html#Proceeding-with-the-Installation
+    \ apparently this uses/makes the folder /mnt/tmp/guix-inst/
+    \ yes, unionfs melds total space of /mnt (7G) with 75% of RAM(3 of 4G) => 10G
+  * mkdir /mnt/etc
+  * update the installation media, and guix itself!
+    * time guix pull
+      \ //at the very least 29m + 10+ min (nope! that was in virtualbox with 4 CPUs? aka slower)
+      \ note: you are root here! you must be root!
+      \ qemu took: 8m27s
+    * time guix package --upgrade .
+      \ does nothing, 5s
+    * since the above 'guix pull' does not update guix itself! (realpath `which guix` is the same!)
+      * find -L /gnu/store/ -iname install.scm
+        \ finds many but this one's the one:
+        \ /gnu/store/hash-guix-latest/gnu/system/install.scm
+        \ so ...guix-latest/gnu/system/install.scm
+      * time guix system reconfigure --no-grub $thatfile
+        \ 27m15s
+        \ YUP, this updated guix! (realpath `which guix` the hash and build is new, 8062 vs 7000something)
+        \ re-running that the second time should take no more than 32sec
+      * time guix gc
+        \ took like 2min? i forgot (and can't scroll up!)
+  * time guix package -i wget
+    \ about 2min
+    \ need this to wget a dpaste link with my config.scm
+    \ looks like this is still using an older guix, that guix pull didn't seem to have updated it! (eg. lines are being duplicated during download - this is supposed to be fixed in the updated guix, which leads me to believe guix is not updated by that 'guix pull' command!)
+  - cp /etc/configuration/desktop.scm /mnt/etc/config.scm
+  * wget ... the config.scm from a paste service
+    \ FIXME: find a way to share files from host with the guest inside qemu
+  - time guix package -i emacs
+    \ 33m43s
+  * zile /mnt/etc/config.scm
+    * change timezone
+    * change grub device
+      - use blkid to get the UUID of the sda3 device
+        \ unused, used label instead!
+      * use ls -la /dev/disk/by-id/ to get UUID of sda to use for grub
+    * change device "my-root" to "myroot" (the label set during mkfs.ext4 above)
+    * add 'font-dejavu' package to see the right font in xfce4-terminal (instead of a weak one)
+  * time guix system init /mnt/etc/config.scm /mnt
+    \ //vbox(4core): this should take between 95min and 113min, depending on network.
+    \ //vbox(4core): took(with chromium compiling in background): 86m38s
+    \ qemu(1core): 29m34s (failed, dns lookup error)
+    \ + 54min47s (failed to update grub due to me forgetting to change the disk/by-id/ in the config.scm)
+    \ running that command again, continues the process - it still updates substitutes list and copying '' a bunch of all the stuff!
+    \ took an extra: + 5min31sec
+    \ running that command again, since it finished all successfully(no error reported.) re-copying all the stuff and runs grub again, took: 5min17s  again
+  * sync
+  - time herd stop cow-store
+    \ 5+ sec.
+    \ 22sec
+    \ ok, don't run this, else obviously updated commands won't be available anymore! like df, herd, sync
+  * FIXME: need a clean way to umount /mnt !! some commands are using it!
+    \ lsof /mnt
+    \ lsof | grep /mnt
+  * umount /mnt --lazy
+  * sync
+  * reboot
+* log into xfce as root (no password)
+  * passwd z
+    \ z is the user in the config
+    \ now you can login as z, into xfce
+* edit /etc/resolv.conf and change the 10.0.2.3 into 10.0.2.2 (as route -n shows) - NEVERMIND, change to 8.8.8.8 else it won't work, apparently!
+  \ 
+* time guix pull
+  \ as root
+  \ well, this redoes what it did before reboot... 497 files reloading/recompiling, even though guix is still the latest... build 8062
+  \ 8m29s
+* time guix system reconfigure /etc/config.scm
+  \ 6m49s
+  \ same guix build version!
+  \ if you gc-ed after this, then re-running reconfigure takes: 6m11s
+- time guix gc
+  \ 2sec, removed some!
+  \ apparently guix pull and reconfigure gets some of these... and since no one else uses them, they get gc-ed!
+  \ so, avoid gc-ing! else you get reconfigure to needlessly recompile some shiet!
+* make an USB Stick disk image from existing system
+  \ src: https://www.gnu.org/software/guix/manual/guix.html#Building-the-Installation-Image
+  * sudo updatedb
+  * locate install.scm
+  * see the $file with guix-latest...gnu/system/install.scm
+    \ copy/paste full path as $file below
+  * time sudo guix system disk-image --image-size=1G $file
+    \ 57m11s
+    \ the last line is /gnu/store/hash-disk-image
+
