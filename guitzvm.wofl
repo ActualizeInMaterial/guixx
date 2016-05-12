@@ -3,8 +3,23 @@
 * boot from that disk, F12, 2 (if it was Primary Slave) - should boot in under 25 sec
 * setup networking
   * ifconfig -a
-    \ see name of interface: enp0s3
+    \ see name of interface:
+    \ virtualbox: enp0s3
+    \ qemu: eth0
+    \ my t400: enp0s25
   * ifconfig enp0s3 up
+  * set IP
+    * static?
+      * ip addr add 192.168.1.191/24 broadcast 192.168.1.255 dev enp0s25
+        \ the broadcast part is optional, ifconfig reports it as 0.0.0.0 if not set!
+      * ip addr
+        \ see that it's set
+      * remove the ip?
+        \ ip addr del 192.168.1.191/24 dev enp0s25
+      * ip route add 0.0.0.0/0 via 192.168.1.1
+      * echo 'nameserver 8.8.8.8' > /etc/resolv.conf
+        \ that file doesn't exist (dhclient -v enp0s25 would create it, but there's no dhcp server to give me an IP)
+    * dynamic?
   * dhclient -v enp0s3
     \ gets IP
   * ping -c 1 gnu.org

@@ -23,6 +23,7 @@
   (users (cons (user-account
                 (name "z")
                 (comment "")
+(password "z")
                 (group "users")
                 (supplementary-groups '("wheel" "netdev"
                                         "audio" "video" "kvm"))
@@ -43,6 +44,9 @@
   (services (cons*
 ;;    (console-keymap-service  "dvorak")
 	     ;;(gnome-desktop-service)
+(static-networking-service "enp0s25" "192.168.1.191"
+#:name-servers '("8.8.8.8" "8.8.4.4")
+#:gateway "192.168.1.1")
                    (xfce-desktop-service)
                    %desktop-services))
 
