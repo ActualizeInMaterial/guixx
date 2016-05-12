@@ -28,15 +28,26 @@
   \ to update package definitions to latest git master
   \ 8m39s
   \ XXX: do I have to do a 'guix system reconfigure' with the .scm of the boot disk ??! else I am using like the old software, right? (except guix)
+* blkdiscard
+  * blkdiscard -v /dev/sda
+    \ 80g discarded...
 * partition disk
   * cfdisk
     * gpt
-    * 1M Bios boot
-    * 1G Linux swap
-    * 7G Linux filesystem
+    * qemu/virtualbox
+      * 1G Linux swap
+      * 1M Bios boot
+      * (rest) 7G Linux filesystem
+    * t400
+      * 9G swap
+      * 1M bios boot
+      * (rest) 65G linux fs
 * format filesystems
+  * mkswap /dev/sda1
+    \ which is 9G swap!
   * mkfs.ext4 -L myroot /dev/sda3
     \ btrfs won't work - on boot it won't find your myroot labelled partition(also the manual says ext4 only!)
+    \ note the message saying: discarding device blocks: done
 * mount
   * mount -o discard /dev/sda3 /mnt
 * init

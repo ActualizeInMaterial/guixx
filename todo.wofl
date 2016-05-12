@@ -1,1 +1,9 @@
+* serious MITM issue: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=22883
+  \ this won't work: https://git.savannah.gnu.org/cgit/guix.git/snapshot/master.tar.gz
+  \ http does though!
+  \
+  \ and neither would this: https://git.sv.gnu.org/guix.git
+  \ git://  prefix would work (or http:// )
+  \ that's used for git clone
+
 
