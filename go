@@ -17,6 +17,7 @@ usbstickhdd+="37v7r5jvypqrklw8frir0q9df929s8nf-disk-image"
 mkdir -p -- "$sharedfolder"
 time qemu-system-x86_64 -enable-kvm -cpu host -net user -net nic,model=virtio -m 4G -drive file="$cowhdd",discard=on -boot menu=on -virtfs local,path="$sharedfolder",security_model=none,mount_tag="$shf_tag"
 #src: https://gitlab.com/rain1/guix-wiki/wikis/qemu
+#XXX: -vnc localhost:0  (that's 127.0.0.0:5900)  but still has no copy/paste !! tested with: VNC-Viewer-5.3.0-Linux-x64
 
 #XXX: mount (inside guest vm) via:
 #mount -t 9p -o trans=virtio "$shf_tag" mountpointhere -oversion=9p2000.L
