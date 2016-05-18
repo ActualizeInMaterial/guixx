@@ -6,4 +6,22 @@
   \ git://  prefix would work (or http:// )
   \ that's used for git clone
 
+* see why only guix kernel (eg. not nixos, manjaro) hangs when using more than 1 cpu core(in virtualbox) on 'guix system init...'
+
+* does not support btrfs - only ext4 works! (tested, won't boot afterwards!)
+
+* guile(scheme) may not have the ability to be lazy like nix lang.
+  \ didn't test this but read somewhere...
+
+* sometimes the icons under Applications(aka Start button in xfce4) are missing or a red x is in their place.
+
+* sometimes I get booted into Window Maker instead of slim/xfce - wtf!
+
+* those are reasons why not choosing guix!
+  \ + cognitive bias? 'safe space' mumbo jumbo : https://gnunet.org/bot/log/guix/2016-05-09#T1024743
+  \ + the fact that they could but haven't yet fixed that MITM issue (22883 above) eg. by using notabug.org
+  \ + the fact that they aren't using something as easy as github (or notabug.org)
+  \ + https://debbugs.gnu.org/cgi/pkgreport.cgi?package=guix are heavily moderated - my comment didn't make it at all, even after 1 day.
+  \ all these make me realize that I'm better off using nixos!
+
 

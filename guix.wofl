@@ -1,5 +1,5 @@
 * install GuixSD on Virtualbox
-  * FIRST: in Virtualbox for this vm, ensure CPU cores is set to 1 not more!(else it's slower and guest kernel(gnu 4.5.0) hangs during 'guix system init ...'
+  * FIRST: in Virtualbox for this vm, ensure CPU cores is set to 1 not more!(else it's slower and guest kernel(gnu 4.5.0) hangs during 'guix system init ...' - apparently this is wrong, 4 cores still is way faster! guix pull done in 5min50sec vs. over 8min with 1 core! this with 4.6_rc7 and KVM in kernel and selected in virtualbox!)
 * boot from that disk, F12, 2 (if it was Primary Slave) - should boot in under 25 sec
 * setup networking
   * ifconfig -a
@@ -45,8 +45,8 @@
 * format filesystems
   * mkswap /dev/sda1
     \ which is 9G swap!
-  * mkfs.ext4 -L myroot /dev/sda3
-    \ btrfs won't work - on boot it won't find your myroot labelled partition(also the manual says ext4 only!)
+  * mkfs.ext4 -L my-root /dev/sda3
+    \ btrfs won't work - on boot it won't find your my-root labelled partition(also the manual says ext4 only!)
     \ note the message saying: discarding device blocks: done
 * mount
   * mount -o discard /dev/sda3 /mnt
@@ -61,6 +61,7 @@
       \ //at the very least 29m + 10+ min (nope! that was in virtualbox with 4 CPUs? aka slower)
       \ note: you are root here! you must be root!
       \ qemu took: 8m27s
+      \ in virtualbox with 4 cores too: 5min50sec !
     * time guix package --upgrade .
       \ does nothing, 5s
     * since the above 'guix pull' does not update guix itself! (realpath `which guix` is the same!)
@@ -89,7 +90,6 @@
       - use blkid to get the UUID of the sda3 device
         \ unused, used label instead!
       * use ls -la /dev/disk/by-id/ to get UUID of sda to use for grub
-    * change device "my-root" to "myroot" (the label set during mkfs.ext4 above)
     * add 'font-dejavu' package to see the right font in xfce4-terminal (instead of a weak one)
   * time guix system init /mnt/etc/config.scm /mnt
     \ //vbox(4core): this should take between 95min and 113min, depending on network.
