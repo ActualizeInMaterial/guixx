@@ -17,6 +17,9 @@
 
 * sometimes I get booted into Window Maker instead of slim/xfce - wtf!
 
+* cannot umount /mnt when done!
+  \ can in NixOS btw!
+
 * those are reasons why not choosing guix!
   \ + cognitive bias? 'safe space' mumbo jumbo : https://gnunet.org/bot/log/guix/2016-05-09#T1024743
   \ + the fact that they could but haven't yet fixed that MITM issue (22883 above) eg. by using notabug.org
