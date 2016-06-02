@@ -1,6 +1,7 @@
 # guixx
 
-guixx is my /etc/config.scm in GuixSD and docs on how to install this OS.
+guixx is my /etc/config.scm in GuixSD and docs on how to install this OS.  
+Currently this is abandoned (eg. not using this or this OS) so things are likely outdated.  
 
 ## Authors
 
